@@ -89,8 +89,8 @@ class PostItemWidget extends StatelessWidget {
                         softWrap: true,
                       ),
                       SizedBox(height: 16),
-                      if (post.imageUrl != null)
-                        CachedNetworkImage(imageUrl: post.imageUrl!),
+                      if (post.image != null)
+                        CachedNetworkImage(imageUrl: post.image!),
                       const SizedBox(height: 16),
                       Row(
                         children: [

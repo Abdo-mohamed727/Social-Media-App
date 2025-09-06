@@ -1,11 +1,12 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
 import 'dart:io';
 
 class PostRequestBody {
   final String text;
   final String authorId;
-  final File? image;
-  final File? file;
+  final String? image;
+  final String? file;
 
   const PostRequestBody({
     required this.text,
@@ -20,10 +21,10 @@ class PostRequestBody {
     result.addAll({'text': text});
     result.addAll({'author_id': authorId});
     if (image != null) {
-      result.addAll({'image': base64Encode(image!.readAsBytesSync())});
+      result.addAll({'image': image});
     }
     if (file != null) {
-      result.addAll({'file': base64Encode(file!.readAsBytesSync())});
+      result.addAll({'file': file});
     }
 
     return result;
@@ -42,4 +43,18 @@ class PostRequestBody {
 
   factory PostRequestBody.fromJson(String source) =>
       PostRequestBody.fromMap(json.decode(source));
+
+  PostRequestBody copyWith({
+    String? text,
+    String? authorId,
+    String? image,
+    String? file,
+  }) {
+    return PostRequestBody(
+      text: text ?? this.text,
+      authorId: authorId ?? this.authorId,
+      image: image ?? this.image,
+      file: file ?? this.file,
+    );
+  }
 }

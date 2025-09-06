@@ -68,13 +68,8 @@ class HomeCubit extends Cubit<HomeState> {
         emit(PostAddError('user not authenticated'));
         return;
       }
-      final post = PostRequestBody(
-        text: text,
-        authorId: currentUser.id,
-        image: currentImage,
-        file: currentFile,
-      );
-      await homeservices.addPost(post);
+      final post = PostRequestBody(text: text, authorId: currentUser.id);
+      await homeservices.addPost(post, currentImage, currentFile);
       emit(PostAdded(post));
     } catch (e) {
       emit(PostAddError(e.toString()));
