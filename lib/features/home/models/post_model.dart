@@ -11,6 +11,7 @@ class PostModel {
   final String? image;
   final List<String>? likes;
   final List<String>? comments;
+  final bool isLiked;
 
   const PostModel({
     required this.id,
@@ -23,6 +24,7 @@ class PostModel {
     this.image,
     this.likes,
     this.comments,
+    this.isLiked = false,
   });
 
   Map<String, dynamic> toMap() {
@@ -83,6 +85,7 @@ class PostModel {
     String? image,
     List<String>? likes,
     List<String>? comments,
+    bool? isLiked,
   }) {
     return PostModel(
       id: id ?? this.id,
@@ -95,6 +98,7 @@ class PostModel {
       image: image ?? this.image,
       likes: likes ?? this.likes,
       comments: comments ?? this.comments,
+      isLiked: isLiked ?? this.isLiked,
     );
   }
 }

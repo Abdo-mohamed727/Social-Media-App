@@ -49,6 +49,7 @@ class PostItemWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final homecubit = BlocProvider.of<HomeCubit>(context);
     return Card(
       color: AppColors.white,
       child: Padding(
@@ -94,12 +95,50 @@ class PostItemWidget extends StatelessWidget {
                       const SizedBox(height: 16),
                       Row(
                         children: [
-                          Row(
-                            children: [
-                              Icon(Icons.thumb_up_alt_outlined, size: 20),
-                              SizedBox(width: 4),
-                              Text(post.likes?.length.toString() ?? '0'),
-                            ],
+                          BlocBuilder<HomeCubit, HomeState>(
+                            bloc: homecubit,
+                            buildWhen: (prev, curr) =>
+                                (curr is LikingPost &&
+                                    curr.postId == post.id) ||
+                                (curr is PostLiked && curr.postId == post.id) ||
+                                (curr is PostLikeError &&
+                                    curr.postId == post.id),
+                            builder: (context, state) {
+                              if (state is LikingPost) {
+                                return Center(
+                                  child: CircularProgressIndicator.adaptive(),
+                                );
+                              }
+                              return Row(
+                                children: [
+                                  IconButton(
+                                    onPressed: () async {
+                                      await homecubit.likePost(post.id);
+                                    },
+                                    icon: Icon(
+                                      (state is PostLiked
+                                              ? state.isLiked
+                                              : post.isLiked)
+                                          ? Icons.thumb_up_alt
+                                          : Icons.thumb_up_alt_outlined,
+                                      size: 30,
+                                      color:
+                                          (state is PostLiked
+                                              ? state.isLiked
+                                              : post.isLiked)
+                                          ? AppColors.primary
+                                          : AppColors.black,
+                                    ),
+                                  ),
+                                  SizedBox(width: 4),
+                                  Text(
+                                    state is PostLiked
+                                        ? state.likesCount.toString()
+                                        : post.likes?.length.toString() ?? '0',
+                                  ),
+                                ],
+                              );
+                            },
                           ),
                           SizedBox(width: 16),
                           Row(

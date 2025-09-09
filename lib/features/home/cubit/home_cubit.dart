@@ -1,8 +1,8 @@
 import 'dart:io';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:social_media_app/core/services/core_auth_services.dart';
+import 'package:social_media_app/core/services/supabase_database_services.dart';
 import 'package:social_media_app/features/auth/models/user_data.dart';
 import 'package:social_media_app/features/home/models/post_model.dart';
 import 'package:social_media_app/features/home/models/post_request_model.dart';
@@ -49,7 +49,10 @@ class HomeCubit extends Cubit<HomeState> {
       for (var post in rawPosts) {
         final userData = await coreAuthServices.getUserData(post.authorId);
         if (userData != null) {
-          post = post.copyWith(authorName: userData.name);
+          post = post.copyWith(
+            authorName: userData.name,
+            isLiked: post.likes?.contains(userData.id) ?? false,
+          );
         }
         posts.add(post);
       }
@@ -135,6 +138,21 @@ class HomeCubit extends Cubit<HomeState> {
       emit(FilePickedError('no file selected'));
     } catch (e) {
       emit(FilePickedError(e.toString()));
+    }
+  }
+
+  Future<void> likePost(String postId) async {
+    emit(LikingPost(postId));
+    try {
+      final currnetUser = await coreAuthServices.getCurrentUserData();
+      if (currnetUser == null) {
+        emit(PostLikeError('User not authenticated', postId));
+        return;
+      }
+      final newPost = await homeservices.likePost(postId, currnetUser.id);
+      emit(PostLiked(newPost.likes?.length ?? 0, postId, newPost.isLiked));
+    } catch (e) {
+      emit(PostLikeError(e.toString(), postId));
     }
   }
 }

@@ -72,3 +72,21 @@ final class FilePickedError extends HomeState {
 
   FilePickedError(this.message);
 }
+
+final class LikingPost extends HomeState {
+  final String postId;
+  LikingPost(this.postId);
+}
+
+final class PostLiked extends HomeState {
+  final int likesCount;
+  final String postId;
+  final bool isLiked;
+  PostLiked(this.likesCount, this.postId, this.isLiked);
+}
+
+final class PostLikeError extends HomeState {
+  final String message;
+  final String postId;
+  PostLikeError(this.message, this.postId);
+}
