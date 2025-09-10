@@ -1,7 +1,11 @@
+import 'dart:collection';
 import 'dart:io';
 
 import 'package:social_media_app/core/services/supabase_database_services.dart';
+import 'package:social_media_app/core/utils/app_constants.dart';
 import 'package:social_media_app/core/utils/app_tables.dart';
+import 'package:social_media_app/features/home/models/comment_model.dart';
+import 'package:social_media_app/features/home/models/comment_request_body.dart';
 import 'package:social_media_app/features/home/models/post_model.dart';
 import 'package:social_media_app/features/home/models/post_request_model.dart';
 import 'package:social_media_app/features/home/models/stories_model.dart';
@@ -35,6 +39,19 @@ class HomeServices {
     }
   }
 
+  Future<PostModel?> fetchPostById(String postId) async {
+    try {
+      return await subabaseservices.fetchRow(
+        table: AppTables.posts,
+        primaryKey: 'id',
+        id: postId,
+        builder: (data, id) => PostModel.fromMap(data),
+      );
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   Future<void> addPost(PostRequestBody post, [File? image, File? file]) async {
     try {
       String? imageUrl;
@@ -51,8 +68,7 @@ class HomeServices {
       }
       if (imageUrl != null || fileUrl != null) {
         post = post.copyWith(
-          image:
-              'https://mxeceaudtldkyolieayz.supabase.co/storage/v1/object/public/$imageUrl',
+          image: '${AppConstants.baseMediaUrl}$imageUrl',
           file: fileUrl,
         );
       }
@@ -89,6 +105,50 @@ class HomeServices {
         value: postId,
       );
       return post;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<void> addComment({
+    required String postID,
+    required String autherId,
+    required String text,
+    File? image,
+  }) async {
+    try {
+      String? imgurl;
+      if (image != null) {
+        imgurl = await supabaseStorageClient.storage
+            .from(AppTables.comments)
+            .upload(
+              'private/${DateTime.now().toIso8601String()}',
+              image,
+              fileOptions: FileOptions(cacheControl: '3600', upsert: true),
+            );
+      }
+      final comment = CommentRequestBody(
+        text: text,
+        authorId: autherId,
+        postId: postID,
+        image: imgurl != null ? '${AppConstants.baseMediaUrl}$imgurl' : null,
+      );
+      await subabaseservices.insertRow(
+        table: AppTables.comments,
+        values: comment.toMap(),
+      );
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<List<CommentModel>> fetchComments(String postId) async {
+    try {
+      return await subabaseservices.fetchRows(
+        table: AppTables.comments,
+        builder: (data, id) => CommentModel.fromMap(data),
+        filter: (query) => query.eq('post_id', postId),
+      );
     } catch (e) {
       rethrow;
     }

@@ -90,3 +90,36 @@ final class PostLikeError extends HomeState {
   final String postId;
   PostLikeError(this.message, this.postId);
 }
+
+final class FetchingLikePost extends HomeState {}
+
+final class LikesPostFetched extends HomeState {
+  final List<UserData> Likes;
+  LikesPostFetched(this.Likes);
+}
+
+final class LikespostFetchingError extends HomeState {
+  final String message;
+  LikespostFetchingError(this.message);
+}
+
+final class AddingComment extends HomeState {}
+
+final class CommentAdded extends HomeState {}
+
+final class AddingCommentError extends HomeState {
+  final String message;
+  AddingCommentError(this.message);
+}
+
+final class FetchingComments extends HomeState {}
+
+final class CommentsFetched extends HomeState {
+  final List<CommentModel> comments;
+  CommentsFetched(this.comments);
+}
+
+final class FetchingCommentsError extends HomeState {
+  final String message;
+  FetchingCommentsError(this.message);
+}

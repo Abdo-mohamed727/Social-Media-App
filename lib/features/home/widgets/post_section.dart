@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:social_media_app/core/utils/colors.dart';
 import 'package:social_media_app/features/home/cubit/home_cubit.dart';
 import 'package:social_media_app/features/home/models/post_model.dart';
+import 'package:social_media_app/features/home/widgets/comment_sheet_section.dart';
 
 class PostSection extends StatelessWidget {
   const PostSection({super.key});
@@ -49,6 +50,7 @@ class PostItemWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
     final homecubit = BlocProvider.of<HomeCubit>(context);
     return Card(
       color: AppColors.white,
@@ -141,12 +143,35 @@ class PostItemWidget extends StatelessWidget {
                             },
                           ),
                           SizedBox(width: 16),
-                          Row(
-                            children: [
-                              Icon(Icons.comment_bank_outlined, size: 20),
-                              SizedBox(width: 4),
-                              Text(post.comments?.length.toString() ?? '0'),
-                            ],
+                          InkWell(
+                            onTap: () {
+                              showModalBottomSheet(
+                                context: context,
+                                useRootNavigator: true,
+                                isScrollControlled: true,
+                                backgroundColor: AppColors.white,
+
+                                builder: (context) => SizedBox(
+                                  height: size.height * .9,
+                                  width: size.width,
+
+                                  child: SafeArea(
+                                    child: BlocProvider.value(
+                                      value: HomeCubit(),
+
+                                      child: CommentSheetSection(post: post),
+                                    ),
+                                  ),
+                                ),
+                              );
+                            },
+                            child: Row(
+                              children: [
+                                Icon(Icons.comment_bank_outlined, size: 20),
+                                SizedBox(width: 4),
+                                Text(post.commentsCount.toString() ?? '0'),
+                              ],
+                            ),
                           ),
                         ],
                       ),

@@ -32,7 +32,8 @@ class StorySection extends StatelessWidget {
             return Center(child: CircularProgressIndicator.adaptive());
           } else if (state is StoriesLooded) {
             final stories = state.stories;
-            return ListView.builder(
+            return ListView.separated(
+              separatorBuilder: (context, index) => const SizedBox(width: 12),
               scrollDirection: Axis.horizontal,
               itemCount: stories.length + 1,
               itemBuilder: (context, index) {

@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_media_app/core/services/core_auth_services.dart';
 import 'package:social_media_app/core/services/supabase_database_services.dart';
 import 'package:social_media_app/features/auth/models/user_data.dart';
+import 'package:social_media_app/features/home/models/comment_model.dart';
 import 'package:social_media_app/features/home/models/post_model.dart';
 import 'package:social_media_app/features/home/models/post_request_model.dart';
 
@@ -48,6 +49,8 @@ class HomeCubit extends Cubit<HomeState> {
       List<PostModel> posts = [];
       for (var post in rawPosts) {
         final userData = await coreAuthServices.getUserData(post.authorId);
+        final postComments = await homeservices.fetchComments(post.id);
+        post = post.copyWith(commentsCount: postComments.length);
         if (userData != null) {
           post = post.copyWith(
             authorName: userData.name,
@@ -153,6 +156,73 @@ class HomeCubit extends Cubit<HomeState> {
       emit(PostLiked(newPost.likes?.length ?? 0, postId, newPost.isLiked));
     } catch (e) {
       emit(PostLikeError(e.toString(), postId));
+    }
+  }
+
+  Future<void> fetchLikesPostDetails(String postId) async {
+    emit(FetchingLikePost());
+    try {
+      final post = await homeservices.fetchPostById(postId);
+      if (post == null) {
+        emit(LikespostFetchingError('no post found'));
+        return;
+      }
+      final Likes = <UserData>[];
+      for (var likeId in post.likes ?? []) {
+        final userData = await coreAuthServices.getUserData(likeId);
+        if (userData != null) {
+          Likes.add(userData);
+        }
+      }
+      emit(LikesPostFetched(Likes));
+    } catch (e) {
+      emit(LikespostFetchingError(e.toString()));
+    }
+  }
+
+  Future<void> addComment({
+    required String postId,
+    required String text,
+    File? image,
+  }) async {
+    emit(AddingComment());
+    try {
+      final currentuser = await coreAuthServices.getCurrentUserData();
+      if (currentuser == null) {
+        emit(AddingCommentError('no comment added'));
+        return;
+      }
+      await homeservices.addComment(
+        postID: postId,
+        autherId: currentuser.id,
+        text: text,
+        image: image,
+      );
+      emit(CommentAdded());
+    } catch (e) {
+      emit(AddingCommentError(e.toString()));
+    }
+  }
+
+  Future<void> fetchComments(String postId) async {
+    emit(FetchingComments());
+    try {
+      final comments = await homeservices.fetchComments(postId);
+      List<CommentModel> commentList = [];
+      for (var comment in comments) {
+        final userData = await coreAuthServices.getUserData(comment.authorId);
+
+        if (userData != null) {
+          comment = comment.copyWith(
+            authorImageUrl: userData.imgUrl,
+            authorName: userData.name,
+          );
+        }
+        commentList.add(comment);
+      }
+      emit(CommentsFetched(commentList));
+    } catch (e) {
+      FetchingCommentsError(e.toString());
     }
   }
 }
