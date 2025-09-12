@@ -1,3 +1,4 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
 
 class CommentRequestBody {
@@ -39,4 +40,18 @@ class CommentRequestBody {
 
   factory CommentRequestBody.fromJson(String source) =>
       CommentRequestBody.fromMap(json.decode(source));
+
+  CommentRequestBody copyWith({
+    String? text,
+    String? authorId,
+    String? postId,
+    String? image,
+  }) {
+    return CommentRequestBody(
+      text: text ?? this.text,
+      authorId: authorId ?? this.authorId,
+      postId: postId ?? this.postId,
+      image: image ?? this.image,
+    );
+  }
 }

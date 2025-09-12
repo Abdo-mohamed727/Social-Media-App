@@ -96,10 +96,16 @@ class SupabaseDatabaseServices {
     required String table,
     required String column,
     required dynamic value,
+    PostgrestFilterBuilder Function(PostgrestFilterBuilder query)? filter,
   }) async {
     try {
-      // Perform delete with a filter condition
-      await _db.from(table).delete().eq(column, value);
+      var query = _db.from(table).delete().eq(column, value);
+
+      if (filter != null) {
+        query = filter(query);
+      }
+
+      await query;
     } on PostgrestException catch (e) {
       debugPrint('Delete error on $table where $column==$value: ${e.message}');
       rethrow;

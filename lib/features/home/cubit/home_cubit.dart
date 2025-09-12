@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_media_app/core/services/core_auth_services.dart';
 import 'package:social_media_app/core/services/supabase_database_services.dart';
@@ -196,7 +197,7 @@ class HomeCubit extends Cubit<HomeState> {
         postID: postId,
         autherId: currentuser.id,
         text: text,
-        image: image,
+        image: currentImage,
       );
       emit(CommentAdded());
     } catch (e) {
@@ -223,6 +224,27 @@ class HomeCubit extends Cubit<HomeState> {
       emit(CommentsFetched(commentList));
     } catch (e) {
       FetchingCommentsError(e.toString());
+    }
+  }
+
+  Future<void> refrechComments(CommentModel comment) async {
+    await fetchComments(comment.id);
+  }
+
+  Future<void> deleteComment(String postId, String commentId) async {
+    emit(DeletingComment(commentId));
+    try {
+      // final userData= await coreAuthServices.getUserData(user.id);
+      // final comment= await homeservices.fetchCommentById(commentId);
+      // if(comment!.authorId == userData){
+
+      // }
+
+      await homeservices.deleteComment(postId, commentId);
+
+      emit(CommentDeleted(commentId));
+    } catch (e) {
+      emit(CommentDeleteError(e.toString(), commentId));
     }
   }
 }

@@ -105,7 +105,10 @@ final class LikespostFetchingError extends HomeState {
 
 final class AddingComment extends HomeState {}
 
-final class CommentAdded extends HomeState {}
+final class CommentAdded extends HomeState {
+  // final CommentModel comment;
+  // CommentAdded(this.comment);
+}
 
 final class AddingCommentError extends HomeState {
   final String message;
@@ -122,4 +125,21 @@ final class CommentsFetched extends HomeState {
 final class FetchingCommentsError extends HomeState {
   final String message;
   FetchingCommentsError(this.message);
+}
+
+final class DeletingComment extends HomeState {
+  final String commentId;
+  DeletingComment(this.commentId);
+}
+
+final class CommentDeleted extends HomeState {
+  // final List<CommentModel> comment;
+  final String commentId;
+  CommentDeleted(this.commentId);
+}
+
+final class CommentDeleteError extends HomeState {
+  final String message;
+  final String commentId;
+  CommentDeleteError(this.message, this.commentId);
 }

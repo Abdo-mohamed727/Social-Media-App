@@ -52,6 +52,19 @@ class HomeServices {
     }
   }
 
+  Future<CommentModel?> fetchCommentById(String commentId) async {
+    try {
+      return await subabaseservices.fetchRow(
+        table: AppTables.comments,
+        primaryKey: 'id',
+        id: commentId,
+        builder: (data, id) => CommentModel.fromMap(data),
+      );
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   Future<void> addPost(PostRequestBody post, [File? image, File? file]) async {
     try {
       String? imageUrl;
@@ -127,12 +140,17 @@ class HomeServices {
               fileOptions: FileOptions(cacheControl: '3600', upsert: true),
             );
       }
-      final comment = CommentRequestBody(
+      var comment = CommentRequestBody(
         text: text,
         authorId: autherId,
         postId: postID,
-        image: imgurl != null ? '${AppConstants.baseMediaUrl}$imgurl' : null,
+        image: imgurl,
       );
+      if (imgurl != null) {
+        comment = comment.copyWith(
+          image: '${AppConstants.baseMediaUrl}$imgurl',
+        );
+      }
       await subabaseservices.insertRow(
         table: AppTables.comments,
         values: comment.toMap(),
@@ -148,6 +166,18 @@ class HomeServices {
         table: AppTables.comments,
         builder: (data, id) => CommentModel.fromMap(data),
         filter: (query) => query.eq('post_id', postId),
+      );
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<void> deleteComment(String postId, String commentId) async {
+    try {
+      await subabaseservices.deleteRow(
+        table: AppTables.comments,
+        column: 'id',
+        value: commentId,
       );
     } catch (e) {
       rethrow;
