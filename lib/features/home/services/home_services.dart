@@ -39,19 +39,6 @@ class HomeServices {
     }
   }
 
-  Future<PostModel?> fetchPostById(String postId) async {
-    try {
-      return await subabaseservices.fetchRow(
-        table: AppTables.posts,
-        primaryKey: 'id',
-        id: postId,
-        builder: (data, id) => PostModel.fromMap(data),
-      );
-    } catch (e) {
-      rethrow;
-    }
-  }
-
   Future<CommentModel?> fetchCommentById(String commentId) async {
     try {
       return await subabaseservices.fetchRow(
@@ -89,83 +76,6 @@ class HomeServices {
       await subabaseservices.insertRow(
         table: AppTables.posts,
         values: post.toMap(),
-      );
-    } catch (e) {
-      rethrow;
-    }
-  }
-
-  Future<PostModel> likePost(String postId, String userID) async {
-    try {
-      var post = await subabaseservices.fetchRow(
-        table: AppTables.posts,
-        primaryKey: 'id',
-        id: postId,
-        builder: (data, id) => PostModel.fromMap(data),
-      );
-      if (post.likes != null && post.likes!.contains(userID)) {
-        post.likes!.remove(userID);
-        post.copyWith(isLiked: false);
-      } else {
-        post = post.copyWith(likes: post.likes ?? []);
-        post = post.copyWith(isLiked: true);
-        post.likes!.add(userID);
-      }
-      await subabaseservices.updateRow(
-        table: AppTables.posts,
-        values: post.toMap(),
-        column: 'id',
-        value: postId,
-      );
-      return post;
-    } catch (e) {
-      rethrow;
-    }
-  }
-
-  Future<void> addComment({
-    required String postID,
-    required String autherId,
-    required String text,
-    File? image,
-  }) async {
-    try {
-      String? imgurl;
-      if (image != null) {
-        imgurl = await supabaseStorageClient.storage
-            .from(AppTables.comments)
-            .upload(
-              'private/${DateTime.now().toIso8601String()}',
-              image,
-              fileOptions: FileOptions(cacheControl: '3600', upsert: true),
-            );
-      }
-      var comment = CommentRequestBody(
-        text: text,
-        authorId: autherId,
-        postId: postID,
-        image: imgurl,
-      );
-      if (imgurl != null) {
-        comment = comment.copyWith(
-          image: '${AppConstants.baseMediaUrl}$imgurl',
-        );
-      }
-      await subabaseservices.insertRow(
-        table: AppTables.comments,
-        values: comment.toMap(),
-      );
-    } catch (e) {
-      rethrow;
-    }
-  }
-
-  Future<List<CommentModel>> fetchComments(String postId) async {
-    try {
-      return await subabaseservices.fetchRows(
-        table: AppTables.comments,
-        builder: (data, id) => CommentModel.fromMap(data),
-        filter: (query) => query.eq('post_id', postId),
       );
     } catch (e) {
       rethrow;

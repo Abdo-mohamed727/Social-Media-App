@@ -8,14 +8,24 @@ class UserData {
   final String email;
   final String? title;
   final String id;
+  final num? followerscount;
+  final num? followingCount;
+  final num? postscount;
+  final List<String>? following;
+  final List<String>? followers;
 
   const UserData({
     required this.name,
+    this.postscount,
 
     this.imgUrl,
     required this.email,
     this.title,
     required this.id,
+    this.followerscount,
+    this.followingCount,
+    this.following,
+    this.followers,
   });
 
   Map<String, dynamic> toMap() {
@@ -26,6 +36,10 @@ class UserData {
       'email': email,
       'title': title,
       'id': id,
+      if (followerscount != null) 'followers_conut': followerscount,
+      if (followingCount != null) 'following_count': followingCount,
+      'following': following,
+      'followers': followers,
     };
   }
 
@@ -37,6 +51,14 @@ class UserData {
       email: map['email'] as String,
       title: map['title'] != null ? map['title'] as String : null,
       id: map['id'] as String,
+      followerscount: map['followers_conut'],
+      followingCount: map['following_count'],
+      following: map['following'] != null
+          ? List<String>.from(map['following'] ?? [])
+          : null,
+      followers: map['followers'] != null
+          ? List<String>.from(map['followers'] ?? [])
+          : null,
     );
   }
 
@@ -52,6 +74,9 @@ class UserData {
     String? email,
     String? title,
     String? id,
+    num? followerscount,
+    num? followingcount,
+    num? postscount,
   }) {
     return UserData(
       name: name ?? this.name,
@@ -60,6 +85,11 @@ class UserData {
       email: email ?? this.email,
       title: title ?? this.title,
       id: id ?? this.id,
+      followerscount: followerscount ?? this.followerscount,
+      followingCount: followingcount ?? this.followingCount,
+      following: following ?? this.following,
+      followers: followers ?? this.followers,
+      postscount: postscount ?? this.postscount,
     );
   }
 }

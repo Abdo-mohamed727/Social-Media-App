@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:social_media_app/core/cubit/cubit/post_cubit.dart';
 import 'package:social_media_app/core/utils/colors.dart';
 import 'package:social_media_app/features/auth/models/user_data.dart';
 import 'package:social_media_app/features/home/cubit/home_cubit.dart';
@@ -14,9 +15,9 @@ class CommentsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final homeCubit = context.read<HomeCubit>();
-    return BlocBuilder<HomeCubit, HomeState>(
-      bloc: homeCubit,
+    final postCubit = context.read<PostCubit>();
+    return BlocBuilder<PostCubit, PostState>(
+      bloc: postCubit,
       buildWhen: (prev, curr) =>
           curr is CommentsFetched ||
           curr is FetchingComments ||
@@ -56,7 +57,7 @@ class CommentWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final homeCubit = context.read<HomeCubit>();
+    final postCubit = context.read<PostCubit>();
     return Column(
       children: [
         Row(
@@ -118,13 +119,13 @@ class CommentWidget extends StatelessWidget {
           padding: const EdgeInsets.only(right: 32.0),
           child: Align(
             alignment: Alignment.topRight,
-            child: BlocConsumer<HomeCubit, HomeState>(
-              bloc: homeCubit,
+            child: BlocConsumer<PostCubit, PostState>(
+              bloc: postCubit,
               listenWhen: (prev, curr) =>
                   curr is CommentDeleted || curr is CommentDeleteError,
               listener: (context, state) async {
                 if (state is CommentDeleted) {
-                  await homeCubit.fetchComments(postId);
+                  await postCubit.fetchComments(postId);
                 } else if (state is CommentDeleteError) {
                   ScaffoldMessenger.of(
                     context,
@@ -142,7 +143,7 @@ class CommentWidget extends StatelessWidget {
                 }
                 return TextButton(
                   onPressed: () async {
-                    await homeCubit.deleteComment(postId, comment.id);
+                    await postCubit.deleteComment(postId, comment.id);
                   },
                   child: Text(
                     'Delete',

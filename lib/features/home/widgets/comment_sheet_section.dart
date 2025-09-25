@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:social_media_app/core/cubit/cubit/post_cubit.dart';
 import 'package:social_media_app/features/auth/models/user_data.dart';
 import 'package:social_media_app/features/home/cubit/home_cubit.dart';
 import 'package:social_media_app/features/home/models/post_model.dart';
@@ -16,12 +17,12 @@ class CommentSheetSection extends StatefulWidget {
 }
 
 class _CommentSheetSectionState extends State<CommentSheetSection> {
-  late HomeCubit _homeCubit;
+  late PostCubit _postCubit;
   @override
   void initState() {
-    _homeCubit = context.read<HomeCubit>();
-    _homeCubit.fetchLikesPostDetails(widget.post.id);
-    _homeCubit.fetchComments(widget.post.id);
+    _postCubit = context.read<PostCubit>();
+    _postCubit.fetchLikesPostDetails(widget.post.id);
+    _postCubit.fetchComments(widget.post.id);
     super.initState();
   }
 

@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_media_app/core/services/core_auth_services.dart';
+import 'package:social_media_app/core/services/post_services.dart';
 import 'package:social_media_app/core/services/supabase_database_services.dart';
 import 'package:social_media_app/features/auth/models/user_data.dart';
 import 'package:social_media_app/features/home/models/comment_model.dart';
@@ -19,6 +20,7 @@ class HomeCubit extends Cubit<HomeState> {
   HomeCubit() : super(HomeInitial());
 
   final homeservices = HomeServices();
+  final postServices = PostServices();
   final coreAuthServices = CoreAuthServices();
   final filepickerservices = FilePickerServices();
   File? currentImage;
@@ -50,7 +52,7 @@ class HomeCubit extends Cubit<HomeState> {
       List<PostModel> posts = [];
       for (var post in rawPosts) {
         final userData = await coreAuthServices.getUserData(post.authorId);
-        final postComments = await homeservices.fetchComments(post.id);
+        final postComments = await postServices.fetchComments(post.id);
         post = post.copyWith(commentsCount: postComments.length);
         if (userData != null) {
           post = post.copyWith(
@@ -142,109 +144,6 @@ class HomeCubit extends Cubit<HomeState> {
       emit(FilePickedError('no file selected'));
     } catch (e) {
       emit(FilePickedError(e.toString()));
-    }
-  }
-
-  Future<void> likePost(String postId) async {
-    emit(LikingPost(postId));
-    try {
-      final currnetUser = await coreAuthServices.getCurrentUserData();
-      if (currnetUser == null) {
-        emit(PostLikeError('User not authenticated', postId));
-        return;
-      }
-      final newPost = await homeservices.likePost(postId, currnetUser.id);
-      emit(PostLiked(newPost.likes?.length ?? 0, postId, newPost.isLiked));
-    } catch (e) {
-      emit(PostLikeError(e.toString(), postId));
-    }
-  }
-
-  Future<void> fetchLikesPostDetails(String postId) async {
-    emit(FetchingLikePost());
-    try {
-      final post = await homeservices.fetchPostById(postId);
-      if (post == null) {
-        emit(LikespostFetchingError('no post found'));
-        return;
-      }
-      final Likes = <UserData>[];
-      for (var likeId in post.likes ?? []) {
-        final userData = await coreAuthServices.getUserData(likeId);
-        if (userData != null) {
-          Likes.add(userData);
-        }
-      }
-      emit(LikesPostFetched(Likes));
-    } catch (e) {
-      emit(LikespostFetchingError(e.toString()));
-    }
-  }
-
-  Future<void> addComment({
-    required String postId,
-    required String text,
-    File? image,
-  }) async {
-    emit(AddingComment());
-    try {
-      final currentuser = await coreAuthServices.getCurrentUserData();
-      if (currentuser == null) {
-        emit(AddingCommentError('no comment added'));
-        return;
-      }
-      await homeservices.addComment(
-        postID: postId,
-        autherId: currentuser.id,
-        text: text,
-        image: currentImage,
-      );
-      emit(CommentAdded());
-    } catch (e) {
-      emit(AddingCommentError(e.toString()));
-    }
-  }
-
-  Future<void> fetchComments(String postId) async {
-    emit(FetchingComments());
-    try {
-      final comments = await homeservices.fetchComments(postId);
-      List<CommentModel> commentList = [];
-      for (var comment in comments) {
-        final userData = await coreAuthServices.getUserData(comment.authorId);
-
-        if (userData != null) {
-          comment = comment.copyWith(
-            authorImageUrl: userData.imgUrl,
-            authorName: userData.name,
-          );
-        }
-        commentList.add(comment);
-      }
-      emit(CommentsFetched(commentList));
-    } catch (e) {
-      FetchingCommentsError(e.toString());
-    }
-  }
-
-  Future<void> refrechComments(CommentModel comment) async {
-    await fetchComments(comment.id);
-  }
-
-  Future<void> deleteComment(String postId, String commentId) async {
-    emit(DeletingComment(commentId));
-    try {
-      // final userData= await coreAuthServices.getUserData(user.id);
-      // final comment= await homeservices.fetchCommentById(commentId);
-      // if(comment!.authorId == userData){
-
-      // }
-
-      await homeservices.deleteComment(postId, commentId);
-
-      emit(CommentDeleted(commentId));
-    } catch (e) {
-      emit(CommentDeleteError(e.toString(), commentId));
     }
   }
 }

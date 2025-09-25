@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:social_media_app/core/cubit/cubit/post_cubit.dart';
 import 'package:social_media_app/core/utils/colors.dart';
 import 'package:social_media_app/features/home/cubit/home_cubit.dart';
+import 'package:social_media_app/features/home/models/comment_model.dart';
 import 'package:social_media_app/features/home/models/post_model.dart';
 
 class SendCommentSection extends StatefulWidget {
@@ -32,6 +34,7 @@ class _SendCommentSectionState extends State<SendCommentSection> {
   @override
   Widget build(BuildContext context) {
     final homeCubit = context.read<HomeCubit>();
+    final postCubit = context.read<PostCubit>();
     return Column(
       children: [
         TextField(
@@ -87,14 +90,14 @@ class _SendCommentSectionState extends State<SendCommentSection> {
             IconButton(onPressed: () {}, icon: Icon(Icons.camera)),
             const Spacer(),
 
-            BlocConsumer<HomeCubit, HomeState>(
-              bloc: homeCubit,
+            BlocConsumer<PostCubit, PostState>(
+              bloc: postCubit,
               listenWhen: (prev, curr) =>
                   curr is CommentAdded || curr is AddingCommentError,
               listener: (context, state) async {
                 if (state is CommentAdded) {
                   _commentController.clear();
-                  await homeCubit.fetchComments(widget.post.id);
+                  await postCubit.fetchComments(widget.post.id);
                   await homeCubit.fetchposts();
                 } else if (state is AddingCommentError) {
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -114,7 +117,7 @@ class _SendCommentSectionState extends State<SendCommentSection> {
                 }
                 return IconButton(
                   onPressed: () async {
-                    await homeCubit.addComment(
+                    await postCubit.addComment(
                       postId: widget.post.id,
                       text: _commentController.text,
                     );
