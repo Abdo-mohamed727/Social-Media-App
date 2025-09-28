@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent_bottom_nav_bar_v2.dart';
+import 'package:social_media_app/features/auth/models/user_data.dart';
 import 'package:social_media_app/features/discover/views/pages/discover_page.dart';
 import 'package:social_media_app/features/home/views/pages/home_page.dart';
 import 'package:social_media_app/features/profile/views/pages/profile_page.dart';
+import 'package:social_media_app/features/settings/views/pages/settings_page.dart';
 
 class CustomButtomNavbar extends StatelessWidget {
   const CustomButtomNavbar({super.key});
@@ -22,6 +24,10 @@ class CustomButtomNavbar extends StatelessWidget {
         PersistentTabConfig(
           screen: ProfilePage(),
           item: ItemConfig(icon: Icon(Icons.person), title: "Profile"),
+        ),
+        PersistentTabConfig(
+          screen: SettingsPage(),
+          item: ItemConfig(icon: Icon(Icons.settings), title: "Settings"),
         ),
       ],
       navBarBuilder: (navBarConfig) =>

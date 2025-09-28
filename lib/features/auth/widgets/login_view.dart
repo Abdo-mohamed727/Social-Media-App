@@ -88,6 +88,7 @@ class _LoginViewState extends State<LoginView> {
                   return MainButton(isLooding: true);
                 }
                 return MainButton(
+                  width: 100,
                   ontap: () async {
                     if (_formkey.currentState!.validate()) {
                       await authcubit.signInWithEmail(
@@ -133,9 +134,41 @@ class _LoginViewState extends State<LoginView> {
             SizedBox(height: 24),
             Column(
               children: [
-                SocialMediaButton(
-                  imgurl: AppAssets.googleIocn,
-                  label: 'Google',
+                BlocConsumer<AuthCubit, AuthState>(
+                  bloc: authcubit,
+                  listenWhen: (prev, curr) =>
+                      curr is AuthWithGoogleError ||
+                      curr is AuthWithGoogleSuccess,
+                  listener: (context, state) {
+                    if (state is AuthWithGoogleSuccess) {
+                      Navigator.of(context).pushNamedAndRemoveUntil(
+                        AppRouts.homeroute,
+                        (route) => false,
+                      );
+                    } else if (state is AuthWithGoogleError) {
+                      ScaffoldMessenger.of(
+                        context,
+                      ).showSnackBar(SnackBar(content: Text(state.message)));
+                    }
+                  },
+                  buildWhen: (prev, curr) =>
+                      curr is AuthWithGoogleError ||
+                      curr is AuthWithGoogleLooding ||
+                      curr is AuthWithGoogleSuccess,
+                  builder: (context, state) {
+                    if (state is AuthWithGoogleLooding) {
+                      return Center(
+                        child: CircularProgressIndicator.adaptive(),
+                      );
+                    }
+                    return SocialMediaButton(
+                      ontap: () async {
+                        await authcubit.signinWithgoogle();
+                      },
+                      imgurl: AppAssets.googleIocn,
+                      label: 'Google',
+                    );
+                  },
                 ),
                 SizedBox(height: 16),
 

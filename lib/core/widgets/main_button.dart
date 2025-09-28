@@ -6,7 +6,6 @@ class MainButton extends StatelessWidget {
   final Widget? child;
   final double hieght;
   final double width;
-  final bool transparent;
 
   final bool isLooding;
   const MainButton({
@@ -15,8 +14,7 @@ class MainButton extends StatelessWidget {
     this.ontap,
     this.child,
     this.hieght = 50,
-    this.width = 50,
-    this.transparent = false,
+    this.width = 200,
   }) : assert(isLooding == false || child == null);
 
   @override
@@ -27,13 +25,12 @@ class MainButton extends StatelessWidget {
       child: ElevatedButton(
         onPressed: ontap,
         style: ElevatedButton.styleFrom(
-          backgroundColor: transparent ? AppColors.white : AppColors.primary,
-          foregroundColor: transparent ? AppColors.black : AppColors.white,
+          backgroundColor: AppColors.primary,
+          foregroundColor: AppColors.white,
           shape: RoundedRectangleBorder(
-            side: transparent
-                ? BorderSide(color: AppColors.grey, width: 2)
-                : BorderSide.none,
-            borderRadius: BorderRadius.circular(8),
+            side: BorderSide(color: AppColors.grey, width: 2),
+
+            borderRadius: BorderRadius.circular(24),
           ),
           padding: const EdgeInsets.symmetric(horizontal: 16),
           elevation: 0,

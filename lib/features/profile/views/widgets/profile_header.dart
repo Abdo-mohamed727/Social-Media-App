@@ -71,7 +71,6 @@ class ProfileHeader extends StatelessWidget {
         ),
         SizedBox(height: 8),
         MainButton(
-          transparent: true,
           width: size.width * .4,
           child: Text('Edit Profile'),
           ontap: () {},

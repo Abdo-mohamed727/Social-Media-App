@@ -35,4 +35,12 @@ class CoreAuthServices {
       rethrow;
     }
   }
+
+  Future<void> logOut() async {
+    try {
+      await supabase.auth.signOut();
+    } catch (e) {
+      rethrow;
+    }
+  }
 }

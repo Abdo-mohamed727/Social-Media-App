@@ -14,3 +14,12 @@ final class AuthFailure extends AuthState {
 }
 
 final class AuthSignedOut extends AuthState {}
+
+final class AuthWithGoogleLooding extends AuthState {}
+
+final class AuthWithGoogleSuccess extends AuthState {}
+
+final class AuthWithGoogleError extends AuthState {
+  final String message;
+  AuthWithGoogleError(this.message);
+}

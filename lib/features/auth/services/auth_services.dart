@@ -74,4 +74,15 @@ class AuthServices {
       rethrow;
     }
   }
+
+  Future<void> signInWithGoogle() async {
+    try {
+      await supabase.auth.signInWithOAuth(
+        OAuthProvider.google,
+        redirectTo: 'com.socialmedia.app://login-callback',
+      );
+    } catch (e) {
+      rethrow;
+    }
+  }
 }

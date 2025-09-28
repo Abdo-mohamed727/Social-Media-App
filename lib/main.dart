@@ -7,6 +7,7 @@ import 'package:social_media_app/core/utils/app_routs.dart';
 import 'package:social_media_app/core/utils/app_theme.dart';
 import 'package:social_media_app/features/auth/cubit/cubit/auth_cubit.dart'
     as auth;
+import 'package:social_media_app/features/settings/cubit/settings_cubit/settings_cubit.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 void main() async {
@@ -15,6 +16,17 @@ void main() async {
     url: AppConstants.subabaseUrl,
     anonKey: AppConstants.subabaseAnonKey,
   );
+  Supabase.instance.client.auth.onAuthStateChange.listen((data) {
+    final event = data.event;
+    final session = data.session;
+
+    if (event == AuthChangeEvent.signedIn && session != null) {
+      debugPrint("  Signed in as: ${session.user.email}");
+    }
+    if (event == AuthChangeEvent.signedOut) {
+      debugPrint(" Signed out");
+    }
+  });
   runApp(const MyApp());
 }
 
@@ -27,6 +39,7 @@ class MyApp extends StatelessWidget {
       providers: [
         BlocProvider(create: (context) => auth.AuthCubit()..checkUserAuth()),
         BlocProvider(create: (context) => PostCubit()),
+        BlocProvider(create: (context) => SettingsCubit()),
       ],
 
       child: Builder(
