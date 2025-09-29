@@ -1,8 +1,12 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:social_media_app/core/utils/app_routs.dart';
 import 'package:social_media_app/core/utils/colors.dart';
 import 'package:social_media_app/core/widgets/main_button.dart';
 import 'package:social_media_app/features/auth/models/user_data.dart';
+import 'package:social_media_app/features/profile/cubit/profile_cubit/profile_page_cubit.dart';
+import 'package:social_media_app/features/profile/models/edit_profile_arg.dart';
 
 class ProfileHeader extends StatelessWidget {
   final UserData userData;
@@ -11,6 +15,7 @@ class ProfileHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.sizeOf(context);
+    final profilecubit = context.read<ProfilePageCubit>();
     return Column(
       children: [
         SizedBox(
@@ -73,7 +78,17 @@ class ProfileHeader extends StatelessWidget {
         MainButton(
           width: size.width * .4,
           child: Text('Edit Profile'),
-          ontap: () {},
+          ontap: () {
+            Navigator.of(context, rootNavigator: true)
+                .pushNamed(
+                  AppRouts.editProfileRoute,
+                  arguments: EditProfileArg(userData: userData),
+                )
+                .then((_) async {
+                  await profilecubit.fetchUserPosts();
+                  await profilecubit.fetchUserProfile();
+                });
+          },
         ),
       ],
     );
