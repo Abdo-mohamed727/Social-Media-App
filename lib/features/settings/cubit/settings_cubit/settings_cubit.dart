@@ -11,6 +11,7 @@ class SettingsCubit extends Cubit<SettingsState> {
     emit(LogOutLooding());
     try {
       await coreauthServices.logOut();
+      emit(LogOutLooded());
     } catch (e) {
       emit(LogoutError(e.toString()));
     }

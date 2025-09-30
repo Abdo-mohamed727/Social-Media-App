@@ -75,7 +75,10 @@ class SettingsPage extends StatelessWidget {
                   curr is LogOutLooded || curr is LogoutError,
               listener: (context, state) {
                 if (state is LogOutLooded) {
-                  Navigator.of(context).pushNamed(AppRouts.authroute);
+                  Navigator.of(context).pushNamedAndRemoveUntil(
+                    AppRouts.authroute,
+                    (route) => false,
+                  );
                 } else if (state is LogoutError) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
