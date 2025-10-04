@@ -72,3 +72,15 @@ final class FilePickedError extends HomeState {
 
   FilePickedError(this.message);
 }
+
+final class AddingStory extends HomeState {}
+
+final class StoryAdded extends HomeState {
+  final StoriesModel story;
+  StoryAdded(this.story);
+}
+
+final class AddingStoryFailed extends HomeState {
+  final String message;
+  AddingStoryFailed(this.message);
+}

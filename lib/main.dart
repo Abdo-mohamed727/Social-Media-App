@@ -16,17 +16,17 @@ void main() async {
     url: AppConstants.subabaseUrl,
     anonKey: AppConstants.subabaseAnonKey,
   );
-  Supabase.instance.client.auth.onAuthStateChange.listen((data) {
-    final event = data.event;
-    final session = data.session;
+  // Supabase.instance.client.auth.onAuthStateChange.listen((data) {
+  //   final event = data.event;
+  //   final session = data.session;
 
-    if (event == AuthChangeEvent.signedIn && session != null) {
-      debugPrint("  Signed in as: ${session.user.email}");
-    }
-    if (event == AuthChangeEvent.signedOut) {
-      debugPrint(" Signed out");
-    }
-  });
+  //   if (event == AuthChangeEvent.signedIn && session != null) {
+  //     debugPrint("  Signed in as: ${session.user.email}");
+  //   }
+  //   if (event == AuthChangeEvent.signedOut) {
+  //     debugPrint(" Signed out");
+  //   }
+  // });
   runApp(const MyApp());
 }
 

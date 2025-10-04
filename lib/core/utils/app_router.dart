@@ -3,9 +3,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_media_app/core/utils/app_routs.dart';
 import 'package:social_media_app/core/views/pages/Custom_buttom_navbar.dart';
 import 'package:social_media_app/core/views/pages/no_pages.dart';
-import 'package:social_media_app/features/auth/models/user_data.dart';
 import 'package:social_media_app/features/home/cubit/home_cubit.dart';
+import 'package:social_media_app/features/home/models/stories_model.dart';
+import 'package:social_media_app/features/home/views/pages/add_story_page.dart';
 import 'package:social_media_app/features/home/views/pages/create_post_page.dart';
+import 'package:social_media_app/features/home/views/pages/user_story_page.dart';
 import 'package:social_media_app/features/profile/models/edit_profile_arg.dart';
 import 'package:social_media_app/features/profile/views/pages/edit_profile_page.dart';
 
@@ -35,6 +37,17 @@ class AppRouter {
         return CupertinoPageRoute(
           builder: (_) =>
               BlocProvider.value(value: homecubit, child: CreatePostPage()),
+          settings: settings,
+        );
+      case AppRouts.userStoryRoute:
+        final story = settings.arguments as StoriesModel;
+        return CupertinoPageRoute(
+          builder: (_) => UserStoryPage(story: story),
+          settings: settings,
+        );
+      case AppRouts.storyroute:
+        return CupertinoPageRoute(
+          builder: (_) => AddStoryPage(),
           settings: settings,
         );
 

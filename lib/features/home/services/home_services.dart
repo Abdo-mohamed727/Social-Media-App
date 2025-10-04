@@ -9,6 +9,7 @@ import 'package:social_media_app/features/home/models/comment_request_body.dart'
 import 'package:social_media_app/features/home/models/post_model.dart';
 import 'package:social_media_app/features/home/models/post_request_model.dart';
 import 'package:social_media_app/features/home/models/stories_model.dart';
+import 'package:social_media_app/features/home/widgets/story_section.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class HomeServices {
@@ -88,6 +89,26 @@ class HomeServices {
         table: AppTables.comments,
         column: 'id',
         value: commentId,
+      );
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<void> addStory(StoriesModel story, File? image, String? text) async {
+    try {
+      String? imageUrl;
+      if (image != null) {
+        imageUrl = await supabaseStorageClient.storage
+            .from(AppTables.story)
+            .upload('private/${DateTime.now().toIso8601String()}', image);
+      }
+      if (imageUrl != null) {
+        story = story.copyWith(imgUrl: '${AppConstants.baseMediaUrl}$imageUrl');
+      }
+      await subabaseservices.insertRow(
+        table: AppTables.stories,
+        values: story.toMap(),
       );
     } catch (e) {
       rethrow;

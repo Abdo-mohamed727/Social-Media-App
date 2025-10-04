@@ -34,7 +34,10 @@ class HomeCubit extends Cubit<HomeState> {
       for (var story in rawStories) {
         final userData = await coreAuthServices.getUserData(story.autherId);
         if (userData != null) {
-          story = story.copyWith(autherName: userData.name);
+          story = story.copyWith(
+            autherName: userData.name,
+            authorimage: userData.imgUrl,
+          );
         }
         stories.add(story);
       }
@@ -144,6 +147,26 @@ class HomeCubit extends Cubit<HomeState> {
       emit(FilePickedError('no file selected'));
     } catch (e) {
       emit(FilePickedError(e.toString()));
+    }
+  }
+
+  Future<void> addStory(String text) async {
+    emit(AddingStory());
+    try {
+      final currentUser = await coreAuthServices.getCurrentUserData();
+      if (currentUser == null) {
+        emit(AddingStoryFailed('usernot found'));
+        return;
+      }
+      final story = StoriesModel(
+        autherId: currentUser.id,
+        createdAt: DateTime.now().toIso8601String(),
+        text: text,
+      );
+      await homeservices.addStory(story, currentImage, text);
+      emit(StoryAdded(story));
+    } catch (e) {
+      emit(AddingStoryFailed(e.toString()));
     }
   }
 }
