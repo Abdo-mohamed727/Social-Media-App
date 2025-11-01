@@ -1,11 +1,9 @@
-import 'dart:math';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:social_media_app/core/utils/colors.dart';
 import 'package:social_media_app/core/widgets/main_button.dart';
 import 'package:social_media_app/features/auth/models/user_data.dart';
+import 'package:social_media_app/features/home/cubit/home_cubit.dart';
 import 'package:social_media_app/features/profile/cubit/edit_profile_cubit/cubit/edit_profile_cubit.dart';
 
 class EditProfilePage extends StatelessWidget {
@@ -17,8 +15,11 @@ class EditProfilePage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(elevation: 0, title: Center(child: Text('Edit Profile'))),
 
-      body: BlocProvider(
-        create: (context) => EditProfileCubit(),
+      body: MultiBlocProvider(
+        providers: [
+          BlocProvider(create: (context) => EditProfileCubit()),
+          BlocProvider(create: (context) => HomeCubit()),
+        ],
         child: EditProfileBody(userData: userData),
       ),
     );
@@ -36,10 +37,20 @@ class EditProfileBody extends StatefulWidget {
 class _EditProfileBodyState extends State<EditProfileBody> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _titleController = TextEditingController();
+  final TextEditingController _aboutmeController = TextEditingController();
+  final TextEditingController _relationshipController = TextEditingController();
+  final TextEditingController _workConrtoller = TextEditingController();
+  final TextEditingController _educationController = TextEditingController();
+
   @override
   void initState() {
     _nameController.text = widget.userData.name;
     _titleController.text = widget.userData.title ?? '';
+    _aboutmeController.text = widget.userData.aboutMe ?? '';
+    _relationshipController.text = widget.userData.relationShip ?? '';
+    _workConrtoller.text = widget.userData.workExperiences ?? '';
+    _educationController.text = widget.userData.education ?? '';
+
     super.initState();
   }
 
@@ -47,12 +58,17 @@ class _EditProfileBodyState extends State<EditProfileBody> {
   void dispose() {
     _nameController.dispose();
     _titleController.dispose();
+    _aboutmeController.dispose();
+    _educationController.dispose();
+    _relationshipController.dispose();
+    _workConrtoller.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final editProfileCubit = context.read<EditProfileCubit>();
+    final homeCubit = context.read<HomeCubit>();
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.all(24.0),
@@ -67,17 +83,41 @@ class _EditProfileBodyState extends State<EditProfileBody> {
                     child: Stack(
                       alignment: Alignment.center,
                       children: [
-                        CircleAvatar(
-                          radius: 50,
-                          backgroundImage: CachedNetworkImageProvider(
-                            widget.userData.imgUrl ??
-                                'https://static.vecteezy.com/system/resources/thumbnails/003/337/584/small/default-avatar-photo-placeholder-profile-icon-vector.jpg',
-                          ),
+                        BlocBuilder<HomeCubit, HomeState>(
+                          bloc: homeCubit,
+                          buildWhen: (previous, current) =>
+                              current is PickingImage ||
+                              current is ImagePicked ||
+                              current is ImagePickedError,
+                          builder: (context, state) {
+                            if (state is PickingImage) {
+                              return Center(
+                                child: CircularProgressIndicator.adaptive(),
+                              );
+                            } else if (state is ImagePicked) {
+                              return CircleAvatar(
+                                radius: 50,
+                                backgroundImage: FileImage(state.image),
+                              );
+                            }
+                            return CircleAvatar(
+                              radius: 50,
+                              backgroundImage: CachedNetworkImageProvider(
+                                widget.userData.imgUrl ??
+                                    'https://static.vecteezy.com/system/resources/thumbnails/003/337/584/small/default-avatar-photo-placeholder-profile-icon-vector.jpg',
+                              ),
+                            );
+                          },
                         ),
                         CircleAvatar(
                           radius: 50,
                           backgroundColor: Colors.black54,
-                          child: Icon(Icons.edit, color: AppColors.white),
+                          child: IconButton(
+                            onPressed: () async {
+                              await homeCubit.pickImage();
+                            },
+                            icon: Icon(Icons.edit),
+                          ),
                         ),
                       ],
                     ),
@@ -92,6 +132,29 @@ class _EditProfileBodyState extends State<EditProfileBody> {
                   TextField(
                     controller: _titleController,
                     decoration: InputDecoration(hintText: 'Title'),
+                  ),
+                  SizedBox(height: 24),
+
+                  TextField(
+                    controller: _educationController,
+                    decoration: InputDecoration(hintText: 'Education'),
+                  ),
+
+                  SizedBox(height: 24),
+                  TextField(
+                    controller: _aboutmeController,
+                    decoration: InputDecoration(hintText: 'about me'),
+                  ),
+                  SizedBox(height: 24),
+
+                  TextField(
+                    controller: _workConrtoller,
+                    decoration: InputDecoration(hintText: 'work experiences'),
+                  ),
+                  SizedBox(height: 24),
+                  TextField(
+                    controller: _relationshipController,
+                    decoration: InputDecoration(hintText: 'RelationShip'),
                   ),
                 ],
               ),
@@ -124,6 +187,10 @@ class _EditProfileBodyState extends State<EditProfileBody> {
                       _nameController.text,
                       _titleController.text,
                       widget.userData.imgUrl,
+                      _aboutmeController.text,
+                      _educationController.text,
+                      _relationshipController.text,
+                      _workConrtoller.text,
                     );
                   },
                   width: double.infinity,

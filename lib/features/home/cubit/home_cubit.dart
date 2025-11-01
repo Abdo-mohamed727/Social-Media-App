@@ -59,6 +59,7 @@ class HomeCubit extends Cubit<HomeState> {
         post = post.copyWith(commentsCount: postComments.length);
         if (userData != null) {
           post = post.copyWith(
+            authorImageUrl: userData.imgUrl,
             authorName: userData.name,
             isLiked: post.likes?.contains(userData.id) ?? false,
           );

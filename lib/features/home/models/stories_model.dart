@@ -46,9 +46,7 @@ class StoriesModel {
       'imgUrl': imgUrl,
       'author_id': autherId,
       'created_at': createdAt,
-      'authorName': autherName,
       'text': text,
-      'author_image': authorimage,
     };
   }
 
@@ -57,9 +55,7 @@ class StoriesModel {
       imgUrl: map['imgUrl'] != null ? map['imgUrl'] as String : null,
       autherId: map['author_id'] ?? '',
       createdAt: map['created_at'] ?? '',
-      autherName: map['authorName'] ?? '',
       text: map['text'] != null ? map['text'] ?? '' : null,
-      authorimage: map['author_image'] ?? '',
     );
   }
 

@@ -65,7 +65,7 @@ class AuthCubit extends Cubit<AuthState> {
   Future<void> signinWithgoogle() async {
     emit(AuthWithGoogleLooding());
     try {
-      await authservices.signInWithGoogle();
+      await authservices.googleSignIn();
       emit(AuthWithGoogleSuccess());
     } catch (e) {
       emit(AuthWithGoogleError(e.toString()));

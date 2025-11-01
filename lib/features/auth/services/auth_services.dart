@@ -1,3 +1,4 @@
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:social_media_app/core/services/supabase_database_services.dart';
 import 'package:social_media_app/core/utils/app_tables.dart';
 import 'package:social_media_app/features/auth/models/user_data.dart';
@@ -74,15 +75,72 @@ class AuthServices {
       rethrow;
     }
   }
+ GoogleSignInAccount? googleUser;
 
-  Future<void> signInWithGoogle() async {
-    try {
-      await supabase.auth.signInWithOAuth(
-        OAuthProvider.google,
-        redirectTo: 'com.socialmedia.app://login-callback',
-      );
-    } catch (e) {
-      rethrow;
+  Future<AuthResponse> googleSignIn() async {
+    const androidClientId  =
+        '703226173077-5238j18jc9s2r54bqgregvplj956nu1p.apps.googleusercontent.com';
+
+     
+    final GoogleSignIn googleSignIn = GoogleSignIn(
+      clientId: androidClientId
+    );
+      googleUser = await googleSignIn.signIn();
+    final googleAuth = await googleUser!.authentication;
+    final accessToken = googleAuth.accessToken;
+    final idToken = googleAuth.idToken;
+
+    if (accessToken == null) {
+      throw 'No Access Token found.';
     }
+    if (idToken == null) {
+      throw 'No ID Token found.';
+    }
+
+    return supabase.auth.signInWithIdToken(
+      provider: OAuthProvider.google,
+      idToken: idToken,
+      accessToken: accessToken,
+    );
   }
+  // Future<void> signInWithGoogle() async {
+  //   try {
+  //     await supabase.auth.signInWithOAuth(
+  //       OAuthProvider.google,
+  //       redirectTo: 'com.socialmedia.app://login-callback',
+  //     );
+  //   } catch (e) {
+  //     rethrow;
+  //   }
+  // }
 }
+//  GoogleSignInAccount? googleUser;
+//   Future<AuthResponse> googleSignIn() async {
+//     const androidClientId =
+//         '761361954261-27q368se1rvdclkhkh2merm84hdkb3nq.apps.googleusercontent.com';
+
+//     final GoogleSignIn googleSignIn = GoogleSignIn(clientId: androidClientId);
+//     log('======================================');
+//     print(await GoogleSignIn().currentUser);
+
+//     // Open Google Sign-In
+//     googleUser = await googleSignIn.signIn();
+
+//     if (googleUser == null) {
+//       throw Exception('Google Sign-In was canceled by user');
+//     }
+
+//     final googleAuth = await googleUser!.authentication;
+//     final accessToken = googleAuth.accessToken;
+//     final idToken = googleAuth.idToken;
+
+//     if (accessToken == null || idToken == null) {
+//       throw Exception('Missing Google Auth tokens');
+//     }
+
+//     return supabase.auth.signInWithIdToken(
+//       provider: OAuthProvider.google,
+//       idToken: idToken,
+//       accessToken: accessToken,
+//     );
+  // }

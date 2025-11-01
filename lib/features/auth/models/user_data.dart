@@ -13,6 +13,10 @@ class UserData {
   final num? postscount;
   final List<String>? following;
   final List<String>? followers;
+  final String? aboutMe;
+  final String? workExperiences;
+  final String? education;
+  final String? relationShip;
 
   const UserData({
     required this.name,
@@ -26,6 +30,10 @@ class UserData {
     this.followingCount,
     this.following,
     this.followers,
+    this.aboutMe,
+    this.education,
+    this.workExperiences,
+    this.relationShip,
   });
 
   Map<String, dynamic> toMap() {
@@ -40,6 +48,10 @@ class UserData {
       if (followingCount != null) 'following_count': followingCount,
       'following': following,
       'followers': followers,
+      'about_me': aboutMe,
+      'work_experiences': workExperiences,
+      'education': education,
+      'relationship': relationShip,
     };
   }
 
@@ -59,6 +71,10 @@ class UserData {
       followers: map['followers'] != null
           ? List<String>.from(map['followers'] ?? [])
           : null,
+      aboutMe: map['about_me'] ?? '',
+      relationShip: map['relationship'] ?? '',
+      education: map['education'] ?? '',
+      workExperiences: map['work_experiences'],
     );
   }
 
@@ -77,6 +93,11 @@ class UserData {
     num? followerscount,
     num? followingcount,
     num? postscount,
+    String? aboutMe,
+    String? education,
+
+    String? workExperiences,
+    String? relationShip,
   }) {
     return UserData(
       name: name ?? this.name,
@@ -90,6 +111,11 @@ class UserData {
       following: following ?? this.following,
       followers: followers ?? this.followers,
       postscount: postscount ?? this.postscount,
+
+      aboutMe: aboutMe ?? this.aboutMe,
+      education: education ?? this.education,
+      workExperiences: workExperiences ?? this.workExperiences,
+      relationShip: relationShip ?? this.relationShip,
     );
   }
 }
